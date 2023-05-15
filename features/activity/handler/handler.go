@@ -116,5 +116,34 @@ func (ah *activHandler) GetOne() echo.HandlerFunc {
 
 // Update implements activity.ActivityHandler
 func (ah *activHandler) Update() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		input := UpdateActivityReq{}
+
+		if err := c.Bind(&input); err != nil {
+			response := helper.APIResponseWithoutData("Bad Request", "Bad request")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		validate := validator.New()
+		if err := validate.Struct(input); err != nil {
+			response := helper.APIResponseWithoutData("Bad Request", "title cannot be null")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		res, err := ah.srv.Update(uint(id), *ReqToCore(input))
+		if err != nil {
+			msg := fmt.Sprintf("Activity with ID %d Not Found", id)
+			response := helper.APIResponseWithoutData("Not Found", msg)
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", CoreToResp(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
