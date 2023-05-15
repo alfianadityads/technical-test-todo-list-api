@@ -95,7 +95,23 @@ func (ah *activHandler) GetAll() echo.HandlerFunc {
 
 // GetOne implements activity.ActivityHandler
 func (ah *activHandler) GetOne() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		res, err := ah.srv.GetOne(uint(id))
+		if err != nil {
+			msg := fmt.Sprintf("Activity with ID %d Not Found", id)
+			response := helper.APIResponseWithoutData("Not Found", msg)
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", CoreToResp(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 // Update implements activity.ActivityHandler
