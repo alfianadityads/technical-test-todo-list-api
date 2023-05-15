@@ -1,8 +1,14 @@
 package handler
 
 import (
+	"fmt"
+	"net/http"
+	"strconv"
+	"strings"
 	"todolistapi/features/activity"
+	"todolistapi/helper"
 
+	"github.com/go-playground/validator"
 	"github.com/labstack/echo/v4"
 )
 
@@ -18,12 +24,59 @@ func New(srv activity.ActivityService) activity.ActivityHandler {
 
 // Create implements activity.ActivityHandler
 func (ah *activHandler) Create() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		input := CreateActivityReq{}
+		if err := c.Bind(&input); err != nil {
+			response := helper.APIResponseWithoutData("Bad Request", "Bad Request")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		validate := validator.New()
+		if err := validate.Struct(input); err != nil {
+			msg := ""
+			fmt.Println(err.Error())
+			if strings.Contains(err.Error(), "Title") {
+				msg = "title cannot be null"
+			} else if strings.Contains(err.Error(), "Email") {
+				msg = "email cannot be null"
+			} else {
+				msg = "request body cannot be null"
+			}
+
+			response := helper.APIResponseWithoutData("Bad Request", msg)
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		res, err := ah.srv.Create(*ReqToCore(input))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", CoreToResp(res))
+		return c.JSON(http.StatusCreated, response)
+	}
 }
 
 // Delete implements activity.ActivityHandler
 func (ah *activHandler) Delete() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		err = ah.srv.Delete(uint(id))
+		if err != nil {
+			msg := fmt.Sprintf("Activity with ID %d Not Found", id)
+			response := helper.APIResponseWithoutData("Not Found", msg)
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", helper.NoData{})
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 // GetAll implements activity.ActivityHandler
