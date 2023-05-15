@@ -28,7 +28,10 @@ func APIResponseWithData(status string, message string, data interface{}) Respon
 	return res
 }
 
-func APIResponseWitouthData(status, message string) ResponseWithoutData {
+type NoData struct {
+}
+
+func APIResponseWithoutData(status, message string) ResponseWithoutData {
 	res := ResponseWithoutData{
 		Message: message,
 		Status:  status,
