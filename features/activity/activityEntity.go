@@ -21,3 +21,11 @@ type ActivityHandler interface {
 	Update() echo.HandlerFunc
 	Delete() echo.HandlerFunc
 }
+
+type ActivityService interface {
+	Create(newActivity Core) (Core, error)
+	GetOne(activityID uint) (Core, error)
+	GerAll() ([]Core, error)
+	Update(activityID uint, updateActivity Core) (Core, error)
+	Delete(activityID uint) error
+}
