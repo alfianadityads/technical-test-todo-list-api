@@ -81,7 +81,16 @@ func (ah *activHandler) Delete() echo.HandlerFunc {
 
 // GetAll implements activity.ActivityHandler
 func (ah *activHandler) GetAll() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		res, err := ah.srv.GetAll()
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", CoreToRespArr(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 // GetOne implements activity.ActivityHandler
