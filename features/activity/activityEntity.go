@@ -25,7 +25,7 @@ type ActivityHandler interface {
 type ActivityService interface {
 	Create(newActivity Core) (Core, error)
 	GetOne(activityID uint) (Core, error)
-	GerAll() ([]Core, error)
+	GetAll() ([]Core, error)
 	Update(activityID uint, updateActivity Core) (Core, error)
 	Delete(activityID uint) error
 }
@@ -33,7 +33,7 @@ type ActivityService interface {
 type ActivityData interface {
 	Create(newActivity Core) (Core, error)
 	GetOne(activityID uint) (Core, error)
-	GerAll() ([]Core, error)
+	GetAll() ([]Core, error)
 	Update(activityID uint, updateActivity Core) (Core, error)
 	Delete(activityID uint) error
 }
