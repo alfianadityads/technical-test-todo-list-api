@@ -49,7 +49,19 @@ func (aq *activityQuery) Delete(activityID uint) error {
 
 // GerAll implements activity.ActivityData
 func (aq *activityQuery) GetAll() ([]activity.Core, error) {
-	panic("unimplemented")
+	allActivity := []Activity{}
+
+	err := aq.db.Find(&allActivity).Error
+	if err != nil {
+		log.Println("Query get All activities error : ", err.Error())
+		return []activity.Core{}, err
+	}
+	result := []activity.Core{}
+	for _, val := range allActivity {
+		result = append(result, ModelToCore(val))
+	}
+
+	return result, nil
 }
 
 // GetOne implements activity.ActivityData
