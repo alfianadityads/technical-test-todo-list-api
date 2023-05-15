@@ -46,7 +46,12 @@ func (as *activityService) Delete(activityID uint) error {
 
 // GetAll implements activity.ActivityService
 func (as *activityService) GetAll() ([]activity.Core, error) {
-	panic("unimplemented")
+	res, err := as.qry.GetAll()
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
 }
 
 // GetOne implements activity.ActivityService
