@@ -29,3 +29,11 @@ type ActivityService interface {
 	Update(activityID uint, updateActivity Core) (Core, error)
 	Delete(activityID uint) error
 }
+
+type ActivityData interface {
+	Create(newActivity Core) (Core, error)
+	GetOne(activityID uint) (Core, error)
+	GerAll() ([]Core, error)
+	Update(activityID uint, updateActivity Core) (Core, error)
+	Delete(activityID uint) error
+}
