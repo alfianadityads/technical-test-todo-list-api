@@ -66,7 +66,15 @@ func (aq *activityQuery) GetAll() ([]activity.Core, error) {
 
 // GetOne implements activity.ActivityData
 func (aq *activityQuery) GetOne(activityID uint) (activity.Core, error) {
-	panic("unimplemented")
+	activ := Activity{}
+
+	err := aq.db.Where("id = ?", activityID).First(&activ).Error
+	if err != nil {
+		log.Println("Query get activity by ID error : ", err.Error())
+		return activity.Core{}, err
+	}
+
+	return ModelToCore(activ), nil
 }
 
 // Update implements activity.ActivityData
