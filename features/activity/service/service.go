@@ -56,7 +56,12 @@ func (as *activityService) GetAll() ([]activity.Core, error) {
 
 // GetOne implements activity.ActivityService
 func (as *activityService) GetOne(activityID uint) (activity.Core, error) {
-	panic("unimplemented")
+	res, err := as.qry.GetOne(activityID)
+	if err != nil {
+		return res, err
+	}
+
+	return res, nil
 }
 
 // Update implements activity.ActivityService
