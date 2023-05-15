@@ -66,5 +66,10 @@ func (as *activityService) GetOne(activityID uint) (activity.Core, error) {
 
 // Update implements activity.ActivityService
 func (as *activityService) Update(activityID uint, updateActivity activity.Core) (activity.Core, error) {
-	panic("unimplemented")
+	res, err := as.qry.Update(activityID, updateActivity)
+	if err != nil {
+		return updateActivity, err
+	}
+
+	return res, nil
 }
