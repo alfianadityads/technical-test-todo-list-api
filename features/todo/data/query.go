@@ -49,7 +49,28 @@ func (tq *todoQuery) Delete(id uint) error {
 
 // GetAll implements todo.TodoData
 func (tq *todoQuery) GetAll(actID uint) ([]todo.Core, error) {
-	panic("unimplemented")
+	allTodo := []Todo{}
+
+	if actID <= 0 {
+		err := tq.db.Find(&allTodo).Error
+		if err != nil {
+			log.Println("Query get All activities error : ", err.Error())
+			return []todo.Core{}, err
+		}
+	} else {
+		err := tq.db.Where("activity_group_id = ?", actID).Find(&allTodo).Error
+		if err != nil {
+			log.Println("Query get All todo error : ", err.Error())
+			return []todo.Core{}, err
+		}
+	}
+
+	todoArr := []todo.Core{}
+	for _, val := range allTodo {
+		todoArr = append(todoArr, ModelToCore(val))
+	}
+
+	return todoArr, nil
 }
 
 // GetOne implements todo.TodoData
