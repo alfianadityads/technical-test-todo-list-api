@@ -1,6 +1,8 @@
 package data
 
 import (
+	"errors"
+	"fmt"
 	"log"
 	"todolistapi/features/todo"
 
@@ -32,7 +34,17 @@ func (tq *todoQuery) Create(newTodo todo.Core) (todo.Core, error) {
 
 // Delete implements todo.TodoData
 func (tq *todoQuery) Delete(id uint) error {
-	panic("unimplemented")
+	qryDelete := tq.db.Delete(&Todo{}, id)
+
+	affectedRow := qryDelete.RowsAffected
+
+	if affectedRow <= 0 {
+		log.Println("No rows affected")
+		msg := fmt.Sprintf("Todo with ID %d Not Found", id)
+		return errors.New(msg)
+	}
+
+	return nil
 }
 
 // GetAll implements todo.TodoData
