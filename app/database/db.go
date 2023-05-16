@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	actData "todolistapi/features/activity/data"
+	todoData "todolistapi/features/todo/data"
 )
 
 func InitDB(cfg config.DBConfig) *gorm.DB {
@@ -25,4 +26,5 @@ func InitDB(cfg config.DBConfig) *gorm.DB {
 
 func Migrate(db *gorm.DB) {
 	db.AutoMigrate(actData.Activity{})
+	db.AutoMigrate(todoData.Todo{})
 }
