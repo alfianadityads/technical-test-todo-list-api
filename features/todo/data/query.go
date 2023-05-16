@@ -88,5 +88,35 @@ func (tq *todoQuery) GetOne(id uint) (todo.Core, error) {
 
 // Update implements todo.TodoData
 func (tq *todoQuery) Update(id uint, updatedTodo todo.Core) (todo.Core, error) {
-	panic("unimplemented")
+	cnvUpdate := CoreToModel(updatedTodo)
+
+	qry := tq.db.Model(Todo{}).Where("id = ?", id).Updates(&cnvUpdate)
+	toggle := tq.db.Model(&cnvUpdate).Where("id = ?", id).Update("is_active", updatedTodo.IsActive)
+	err := qry.Error
+
+	affectedRow := toggle.RowsAffected
+
+	if affectedRow <= 0 {
+		log.Println("No rows affected")
+		msg := fmt.Sprintf("Todo with ID %d Not Found", id)
+		return todo.Core{}, errors.New(msg)
+	}
+
+	affectedRow = qry.RowsAffected
+
+	if affectedRow <= 0 {
+		log.Println("No rows affected")
+		msg := fmt.Sprintf("Todo with ID %d Not Found", id)
+		return todo.Core{}, errors.New(msg)
+	}
+
+	if err != nil {
+		log.Println("Query update todo by ID error : ", err.Error())
+		return todo.Core{}, errors.New("Error")
+	}
+
+	var updateRow Todo
+	tq.db.First(&updateRow, "id = ?", id)
+
+	return ModelToCore(updateRow), nil
 }
