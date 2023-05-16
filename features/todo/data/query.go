@@ -75,7 +75,15 @@ func (tq *todoQuery) GetAll(actID uint) ([]todo.Core, error) {
 
 // GetOne implements todo.TodoData
 func (tq *todoQuery) GetOne(id uint) (todo.Core, error) {
-	panic("unimplemented")
+	act := Todo{}
+
+	err := tq.db.Where("id = ?", id).First(&act).Error
+	if err != nil {
+		log.Println("Query get todo by ID error : ", err.Error())
+		return todo.Core{}, err
+	}
+
+	return ModelToCore(act), nil
 }
 
 // Update implements todo.TodoData
