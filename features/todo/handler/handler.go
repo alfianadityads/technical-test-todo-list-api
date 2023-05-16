@@ -81,12 +81,51 @@ func (th *todoHandler) Delete() echo.HandlerFunc {
 
 // GetAll implements todo.TodoHandler
 func (th *todoHandler) GetAll() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		actGroupID := c.QueryParam("activity_group_id")
+
+		actID := 0
+
+		if actGroupID != "" {
+			id, err := strconv.Atoi(actGroupID)
+			if err != nil {
+				response := helper.APIResponseWithoutData("Bad Request", "Bad Request")
+				return c.JSON(http.StatusBadRequest, response)
+			}
+
+			actID = id
+		}
+
+		res, err := th.srv.GetAll(uint(actID))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusInternalServerError, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", ToResponseArr(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 // GetOne implements todo.TodoHandler
 func (th *todoHandler) GetOne() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		res, err := th.srv.GetOne(uint(id))
+		if err != nil {
+			msg := fmt.Sprintf("Todo with ID %d Not Found", id)
+			response := helper.APIResponseWithoutData("Not Found", msg)
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", ToResponse(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
 
 // Update implements todo.TodoHandler
