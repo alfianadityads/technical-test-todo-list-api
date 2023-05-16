@@ -27,3 +27,15 @@ func CoreToModel(data todo.Core) Todo {
 		ActivityGroupID: data.ActivityGroupID,
 	}
 }
+
+func ModelToCore(data Todo) todo.Core {
+	return todo.Core{
+		ID:              data.ID,
+		Title:           data.Title,
+		IsActive:        data.IsActive,
+		Priority:        data.Priority,
+		ActivityGroupID: data.ActivityGroupID,
+		CreatedAt:       data.CreatedAt,
+		UpdatedAt:       data.UpdatedAt,
+	}
+}
