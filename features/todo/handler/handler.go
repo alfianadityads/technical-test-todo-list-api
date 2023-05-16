@@ -130,5 +130,28 @@ func (th *todoHandler) GetOne() echo.HandlerFunc {
 
 // Update implements todo.TodoHandler
 func (th *todoHandler) Update() echo.HandlerFunc {
-	panic("unimplemented")
+	return func(c echo.Context) error {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			response := helper.APIResponseWithoutData("Error", "Error")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		input := TodoUpdateRequest{}
+
+		if err := c.Bind(&input); err != nil {
+			response := helper.APIResponseWithoutData("Bad Request", "Bad request")
+			return c.JSON(http.StatusBadRequest, response)
+		}
+
+		res, err := h.srv.Update(uint(id), *ReqToCore(input))
+		if err != nil {
+			msg := fmt.Sprintf("Todo with ID %d Not Found", id)
+			response := helper.APIResponseWithoutData("Not Found", msg)
+			return c.JSON(http.StatusNotFound, response)
+		}
+
+		response := helper.APIResponseWithData("Success", "Success", ToResponse(res))
+		return c.JSON(http.StatusOK, response)
+	}
 }
