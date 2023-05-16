@@ -7,6 +7,8 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	actData "todolistapi/features/activity/data"
 )
 
 func InitDB(cfg config.DBConfig) *gorm.DB {
@@ -22,4 +24,5 @@ func InitDB(cfg config.DBConfig) *gorm.DB {
 }
 
 func Migrate(db *gorm.DB) {
+	db.AutoMigrate(actData.Activity{})
 }
