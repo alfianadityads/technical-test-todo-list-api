@@ -79,20 +79,25 @@ func (aq *activityQuery) GetOne(activityID uint) (activity.Core, error) {
 
 // Update implements activity.ActivityData
 func (aq *activityQuery) Update(activityID uint, updateActivity activity.Core) (activity.Core, error) {
-	cnv := CoreToModel(updateActivity)
-	cnv.ID = uint(activityID)
+	cnvUpdated := CoreToModel(updateActivity)
+	qry := aq.db.Model(Activity{}).Where("id = ?", activityID).Updates(&cnvUpdated)
+	err := qry.Error
 
-	updateActiv := aq.db.Where("id = ?", activityID).Updates(&cnv)
-	affrows := updateActiv.RowsAffected
-	if affrows <= 0 {
+	affRow := qry.RowsAffected
+
+	if affRow <= 0 {
 		log.Println("No rows affected")
 		msg := fmt.Sprintf("Activity with ID %d Not Found", activityID)
 		return activity.Core{}, errors.New(msg)
 	}
-	err := updateActiv.Error
+
 	if err != nil {
-		log.Println("Query update activity by ID error", err.Error())
+		log.Println("Query update activity by ID error : ", err.Error())
 		return activity.Core{}, errors.New("Error")
 	}
-	return updateActivity, nil
+
+	var updatedRow Activity
+	aq.db.First(&updatedRow, "id = ?", activityID)
+
+	return ModelToCore(updatedRow), nil
 }
