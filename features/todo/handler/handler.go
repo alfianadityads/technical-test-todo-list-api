@@ -144,7 +144,7 @@ func (th *todoHandler) Update() echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, response)
 		}
 
-		res, err := h.srv.Update(uint(id), *ReqToCore(input))
+		res, err := th.srv.Update(uint(id), *ReqToCore(input))
 		if err != nil {
 			msg := fmt.Sprintf("Todo with ID %d Not Found", id)
 			response := helper.APIResponseWithoutData("Not Found", msg)
